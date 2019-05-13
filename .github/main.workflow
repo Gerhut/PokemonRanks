@@ -1,18 +1,26 @@
 workflow "Scheduled" {
   on = "schedule(* * 0 0 0)"
-  resolves = "Update gist"
+  resolves = "install"
 }
 
 workflow "Pushed" {
   on = "push"
-  resolves = "Update gist"
-
+  resolves = "install"
 }
 
-action "Update gist" {
+action "install" {
   uses = "docker://python:3.5"
-  runs = ["sh", "-c"]
-  args = "pip install -r requirements.txt && python ."
+  args = "-m pip install -r requirements.txt"
+}
+
+action "lint" {
+  uses = "docker://python:3.5"
+  args = "-m flake8 *.py"
+}
+
+action "run" {
+  uses = "docker://python:3.5"
+  args = "."
   secrets = ["GITHUB_TOKEN"]
   env = {
     GIST_ID = "051c57ee1f79ba84835809dc2664fac1"
