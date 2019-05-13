@@ -1,31 +1,44 @@
 workflow "Scheduled" {
   on = "schedule(* * 0 0 0)"
-  resolves = ["run"]
+  resolves = ["Scheduled.run"]
+}
+
+action "Scheduled.install" {
+  uses = "docker://python:3.5"
+  args = "install -r requirements.txt"
+  runs = "pip"
+}
+
+action "Scheduled.run" {
+  uses = "docker://python:3.5"
+  needs = ["Scheduled.install"]
+  args = "."
+  runs = "python"
+  secrets = ["GITHUB_TOKEN", "GIST_ID", "GIST_FILENAME"]
 }
 
 workflow "Pushed" {
   on = "push"
-  resolves = "install"
+  resolves = ["Pushed.run"]
 }
 
-action "install" {
+action "Pushed.install" {
   uses = "docker://python:3.5"
-  args = "python -m pip install -r requirements.txt"
+  runs = "pip"
+  args = "install -r requirements.txt"
 }
 
-action "lint" {
+action "Pushed.lint" {
   uses = "docker://python:3.5"
-  needs = ["install"]
-  args = "python -m flake8 *.py"
+  needs = ["Pushed.install"]
+  runs = "flake8"
+  args = "*.py"
 }
 
-action "run" {
+action "Pushed.run" {
   uses = "docker://python:3.5"
-  needs = ["lint"]
-  args = "python ."
-  secrets = ["GITHUB_TOKEN"]
-  env = {
-    GIST_ID = "051c57ee1f79ba84835809dc2664fac1"
-    GIST_FILENAME = "Pokemon Global Link 今日排名"
-  }
+  needs = ["Pushed.lint"]
+  runs = "python"
+  args = "."
+  secrets = ["GITHUB_TOKEN", "GIST_ID", "GIST_FILENAME"]
 }
