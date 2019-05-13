@@ -14,13 +14,13 @@ action "install" {
 }
 
 action "lint" {
-  needs = "install"
+  needs = ["install"]
   uses = "docker://python:3.5"
   args = "python -m flake8 *.py"
 }
 
 action "run" {
-  needs = "lint"
+  needs = ["lint"]
   uses = "docker://python:3.5"
   args = "python ."
   secrets = ["GITHUB_TOKEN"]
