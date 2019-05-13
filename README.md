@@ -4,8 +4,8 @@ Synchronize top 5 used Pokemon on Pokemon Global Link (double battle) to GitHub 
 
 ## Run
 
-    $ pipenv install
-    $ pipenv run python .
+    $ pip install -r requirements.txt
+    $ python .
 
 ## Configure
 
