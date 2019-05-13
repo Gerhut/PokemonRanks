@@ -1,6 +1,12 @@
-workflow "Main" {
+workflow "Scheduled" {
   on = "schedule(* * 0 0 0)"
   resolves = "Update gist"
+}
+
+workflow "Pushed" {
+  on = "push"
+  resolves = "Update gist"
+
 }
 
 action "Update gist" {
