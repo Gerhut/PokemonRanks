@@ -1,6 +1,6 @@
 workflow "Scheduled" {
   on = "schedule(* * 0 0 0)"
-  resolves = "install"
+  resolves = ["run"]
 }
 
 workflow "Pushed" {
