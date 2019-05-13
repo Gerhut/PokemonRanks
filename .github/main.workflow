@@ -10,17 +10,19 @@ workflow "Pushed" {
 
 action "install" {
   uses = "docker://python:3.5"
-  args = "-m pip install -r requirements.txt"
+  args = "python -m pip install -r requirements.txt"
 }
 
 action "lint" {
+  needs = "install"
   uses = "docker://python:3.5"
-  args = "-m flake8 *.py"
+  args = "python -m flake8 *.py"
 }
 
 action "run" {
+  needs = "lint"
   uses = "docker://python:3.5"
-  args = "."
+  args = "python ."
   secrets = ["GITHUB_TOKEN"]
   env = {
     GIST_ID = "051c57ee1f79ba84835809dc2664fac1"
