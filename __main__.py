@@ -1,5 +1,5 @@
 from math import floor
-from time import time
+from datetime import datetime
 from os import environ
 
 from dotenv import load_dotenv
@@ -11,10 +11,10 @@ generation_id = 4  # Ultra Sun / Ultra Moon
 battle_type = 2  # Double battle
 
 
-def request_pokemon_global_link(url, data=dict(), **kwargs):
+def request_pokemon_global_link(url, data={}, **kwargs):
     url = 'https://3ds.pokemon-gl.com/frontendApi' + url
 
-    timestamp = floor(time() * 1000)
+    timestamp = floor(datetime.now().timestamp() * 1000)
     data = dict({
         'languageId': language_id,
         'timezone': 'UTC',
@@ -61,15 +61,19 @@ def get_pokemons(season, cookies):
     return pokemons
 
 
-def update_github_gist(github_token, gist_id, gist_filename, pokemons):
+def update_github_gist(github_token, gist_id, gist_description_prefix,
+                       gist_filename, pokemons):
     pokemon_names = [pokemon['name'] for pokemon in pokemons]
     content = '\n'.join(pokemon_names)
 
     github = Github(github_token)
     gist = github.get_gist(gist_id)
-    gist.edit(files={
-        gist_filename: InputFileContent(content)
-    })
+
+    description = '{0} @ {1:%c}'.format(
+        gist_description_prefix, datetime.now())
+    files = {gist_filename: InputFileContent(content)}
+
+    gist.edit(description, files)
 
 
 def main():
@@ -81,6 +85,7 @@ def main():
     update_github_gist(
         environ['GITHUB_TOKEN'],
         environ['GIST_ID'],
+        environ['GIST_DESCRIPTION_PREFIX'],
         environ['GIST_FILENAME'],
         pokemons)
 
