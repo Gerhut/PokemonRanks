@@ -13,5 +13,5 @@ Environment variables:
 
 - `GITHUB_TOKEN`
 - `GIST_ID`
-- `GIST_DESCRIPTION_PREFIX`
 - `GIST_FILENAME`
+- `MESSAGE_PREFIX`
