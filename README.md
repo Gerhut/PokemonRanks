@@ -1,6 +1,6 @@
 # PokemonRanks
 
-Synchronize top 5 used Pokemon on Pokemon Global Link (double battle) to GitHub Gist daily.
+Synchronize top 15 used Pokemon on Pokemon Global Link (double battle) to GitHub Gist daily.
 
 ## Run
 

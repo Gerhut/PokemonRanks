@@ -72,8 +72,19 @@ def get_pokemons(season, cookies):
     return pokemons
 
 
+def prepare_repository(github_token, gist_id):
+    repository = Repo.init('dist')
+    remote_url = 'https://{}@gist.github.com/{}.git'.format(
+        github_token, gist_id)
+    remote = repository.create_remote('origin', remote_url)
+
+    print('Pulling repository:', remote_url)
+    remote.pull('master')
+    return repository
+
+
 def get_pokemon_image(pokemon):
-    size = 120
+    size = 90
 
     n = pokemon['monsno']
     id = int(pokemon['formNo'])
@@ -108,26 +119,36 @@ def get_pokemon_image(pokemon):
     return image
 
 
-def prepare_repository(github_token, gist_id):
-    repository = Repo.init('dist')
-    remote_url = 'https://{}@gist.github.com/{}.git'.format(
-        github_token, gist_id)
-    remote = repository.create_remote('origin', remote_url)
-
-    print('Pulling repository:', remote_url)
-    remote.pull('master')
-    return repository
-
-
 def build_ranking_image(pokemons, repository, gist_filename):
-    images = [get_pokemon_image(pokemon) for pokemon in pokemons[:5]]
+    images = (get_pokemon_image(pokemon) for pokemon in pokemons)
 
-    image = Image.new(images[0].mode, (390, 100))
-    image.paste(images[0].resize((100, 100), Image.LANCZOS), (90, 0))
-    image.paste(images[1].resize((90, 90), Image.LANCZOS), (0, 10))
-    image.paste(images[2].resize((80, 80), Image.LANCZOS), (190, 20))
-    image.paste(images[3].resize((60, 60), Image.LANCZOS), (270, 40))
-    image.paste(images[4].resize((60, 60), Image.LANCZOS), (330, 40))
+    map = [
+        # (left, top, width, height)
+        (0, 0, 60, 60),
+        (60, 6, 54, 54),
+        (114, 12, 48, 48),
+        (162, 20, 40, 40),
+        (202, 20, 40, 40),
+        (242, 20, 40, 40),
+        (282, 20, 40, 40),
+
+        (2, 60, 40, 40),
+        (42, 60, 40, 40),
+        (82, 60, 40, 40),
+        (122, 60, 40, 40),
+        (162, 60, 40, 40),
+        (202, 60, 40, 40),
+        (242, 60, 40, 40),
+        (282, 60, 40, 40),
+    ]
+
+    image = Image.new('RGBA', (325, 100))
+    for coordinator in map:
+        pokemon_image = images.__next__()
+        box = coordinator[0:2]
+        size = coordinator[2:4]
+
+        image.paste(pokemon_image.resize(size, Image.LANCZOS), box)
 
     filename = join(repository.working_tree_dir, gist_filename)
     image.save(filename, 'PNG')
